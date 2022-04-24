@@ -9,7 +9,7 @@ interface
 uses
   System.Classes, System.Types, System.UITypes, WinApi.Windows,
   FMX.Controls, FMX.Types, FMX.Forms,
-  uWVWinControl, uWVBrowserBase, uWVConstants;
+  uWVBrowserBase, uWVConstants;
 
 type
   TWVFMXWindowParent = class(TCommonCustomForm)

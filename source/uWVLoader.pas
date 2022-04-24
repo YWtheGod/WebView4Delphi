@@ -7,6 +7,7 @@ unit uWVLoader;
 interface
 
 uses
+  DRT.WIN.WebView2Loader,
   {$IFDEF FPC}
   Windows, Classes, SysUtils, ActiveX, Registry, ShlObj, Math, Dialogs,
   {$ELSE}
@@ -25,7 +26,6 @@ type
       FOnInitializationError                  : TLoaderNotifyEvent;
       FOnBrowserProcessExited                 : TLoaderBrowserProcessExitedEvent;
       FOnProcessInfosChanged                  : TLoaderProcessInfosChangedEvent;
-      FLibHandle                              : THandle;
       FErrorMsg                               : string;
       FError                                  : int64;
       FBrowserExecPath                        : wvstring;
@@ -89,8 +89,6 @@ type
       function  GetDLLVersion(const aDLLFile : wvstring; var aVersionInfo : TFileVersionInfo) : boolean;
       function  GetExtendedFileVersion(const aFileName : wvstring) : uint64;
       function  LoadLibProcedures : boolean;
-      function  LoadWebView2Library : boolean;
-      procedure UnLoadWebView2Library;
       function  CheckWV2Library : boolean;
       function  CheckBrowserExecPath : boolean;
       function  CheckWV2DLL : boolean;
@@ -243,7 +241,6 @@ begin
   FOnInitializationError                  := nil;
   FOnBrowserProcessExited                 := nil;
   FStatus                                 := wvlsCreated;
-  FLibHandle                              := 0;
   FErrorMsg                               := '';
   FError                                  := 0;
   FBrowserExecPath                        := '';
@@ -299,7 +296,6 @@ destructor TWVLoader.Destroy;
 begin
   try
     DestroyEnvironment;
-    UnLoadWebView2Library;
 
     if FInitCOMLibrary then
       CoUnInitialize;
@@ -410,66 +406,6 @@ begin
   except
     on e : exception do
       if CustomExceptionHandler('TWVLoader.GetDLLVersion', e) then raise;
-  end;
-end;
-
-function TWVLoader.LoadWebView2Library : boolean;
-var
-  TempOldDir : string;
-begin
-  Result := False;
-
-  try
-    if (FLibHandle <> 0) then
-      Result := True
-     else
-      try
-        if FSetCurrentDir then
-          begin
-            TempOldDir := GetCurrentDir;
-            chdir(GetModulePath);
-          end;
-
-        FStatus    := wvlsLoading;
-        FLibHandle := LoadLibraryExW(PWideChar(WEBVIEW2LOADERLIB), 0, LOAD_WITH_ALTERED_SEARCH_PATH);
-
-        if (FLibHandle = 0) then
-          begin
-            FStatus   := wvlsError;
-            FError    := GetLastError;
-            FErrorMsg := 'Error loading ' + WEBVIEW2LOADERLIB + CRLF + CRLF +
-                         'Error code : 0x' + inttohex(cardinal(FError), 8) + CRLF +
-                         SysErrorMessage(cardinal(FError));
-
-            ShowErrorMessageDlg(FErrorMsg);
-          end
-         else
-          begin
-            FStatus := wvlsLoaded;
-            Result  := True;
-          end;
-      finally
-        if FSetCurrentDir then
-          chdir(TempOldDir);
-      end;
-  except
-    on e : exception do
-      if CustomExceptionHandler('TWVLoader.LoadWebView2Library', e) then raise;
-  end;
-end;
-
-procedure TWVLoader.UnLoadWebView2Library;
-begin
-  try
-    if (FLibHandle <> 0) then
-      begin
-        FreeLibrary(FLibHandle);
-        FLibHandle := 0;
-        FStatus    := wvlsUnloaded;
-      end;
-  except
-    on e : exception do
-      if CustomExceptionHandler('TWVLoader.UnLoadWebView2Library', e) then raise;
   end;
 end;
 
@@ -774,36 +710,11 @@ end;
 
 function TWVLoader.LoadLibProcedures : boolean;
 begin
-  Result := False;
-
-  try
-    if (FLibHandle <> 0) then
-      begin
-        CreateCoreWebView2EnvironmentWithOptions      := GetProcAddress(FLibHandle, 'CreateCoreWebView2EnvironmentWithOptions');
-        CreateCoreWebView2Environment                 := GetProcAddress(FLibHandle, 'CreateCoreWebView2Environment');
-        GetAvailableCoreWebView2BrowserVersionString  := GetProcAddress(FLibHandle, 'GetAvailableCoreWebView2BrowserVersionString');
-        CompareBrowserVersions                        := GetProcAddress(FLibHandle, 'CompareBrowserVersions');
-
-        if assigned(CreateCoreWebView2EnvironmentWithOptions)     and
-           assigned(CreateCoreWebView2Environment)                and
-           assigned(GetAvailableCoreWebView2BrowserVersionString) and
-           assigned(CompareBrowserVersions)                       then
-          begin
-            Result  := True;
-            FStatus := wvlsImported;
-          end
-         else
-          begin
-            FStatus   := wvlsError;
-            FErrorMsg := 'There was a problem loading the library procedures';
-
-            ShowErrorMessageDlg(FErrorMsg);
-          end;
-      end;
-  except
-    on e : exception do
-      if CustomExceptionHandler('TWVLoader.LoadLibProcedures', e) then raise;
-  end;
+  CreateCoreWebView2EnvironmentWithOptions      := @DRT.WIN.WebView2Loader.CreateCoreWebView2EnvironmentWithOptions;
+  CreateCoreWebView2Environment                 := @DRT.WIN.WebView2Loader.CreateCoreWebView2Environment;
+  GetAvailableCoreWebView2BrowserVersionString  := @DRT.WIN.WebView2Loader.GetCoreWebView2BrowserVersionString;
+  CompareBrowserVersions                        := @DRT.WIN.WebView2Loader.CompareBrowserVersions;
+  Result := True;
 end;
 
 function TWVLoader.GetCustomCommandLineSwitches : wvstring;
@@ -1147,7 +1058,6 @@ begin
     CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
 
   Result := CheckWV2Library     and
-            LoadWebView2Library and
             LoadLibProcedures   and
             CreateEnvironment;
 end;
