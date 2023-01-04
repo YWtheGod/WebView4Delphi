@@ -7,10 +7,10 @@ unit uWVCoreWebView2ContextMenuItem;
 interface
 
 uses
-  {$IFDEF FPC}
-  Classes, ActiveX,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   System.Classes, Winapi.ActiveX,
+  {$ELSE}
+  Classes, ActiveX,
   {$ENDIF}
   uWVTypeLibrary, uWVTypes;
 
@@ -203,18 +203,14 @@ end;
 
 function TCoreWebView2ContextMenuItem.AddCustomItemSelectedEvent(const aBrowserComponent : TComponent) : boolean;
 var
-  TempHandler : ICoreWebView2CustomItemSelectedEventHandler;
-  TempToken   : EventRegistrationToken;
+  TempToken : EventRegistrationToken;
 begin
   Result := False;
 
   if Initialized then
-    try
-      TempHandler     := TCoreWebView2CustomItemSelectedEventHandler.Create(TWVBrowserBase(aBrowserComponent));
+    begin
       TempToken.value := 0;
-      Result          := succeeded(FBaseIntf.add_CustomItemSelected(TempHandler, TempToken));
-    finally
-      TempHandler := nil;
+      Result          := succeeded(FBaseIntf.add_CustomItemSelected(TWVBrowserBase(aBrowserComponent).CustomItemSelectedEventHandler, TempToken));
     end;
 end;
 

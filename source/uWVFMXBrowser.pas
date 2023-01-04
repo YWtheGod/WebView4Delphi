@@ -13,10 +13,12 @@ uses
   uWVBrowserBase;
 
 type
-  {$IFNDEF FPC}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}
+  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
   TWVFMXBrowser = class(TWVBrowserBase)
     protected
       function  GetParentForm : TCustomForm;
+      function  GetParentFormHandle : HWND;
+      function  GetScreenScale : single; override;
 
     public
       procedure MoveFormTo(const x, y: Integer); override;
@@ -110,12 +112,19 @@ type
       property OnCustomItemSelected;
       property OnStatusBarTextChanged;
       property OnFramePermissionRequested;
+      property OnClearBrowsingDataCompleted;
+      property OnServerCertificateErrorActionsCompleted;
+      property OnServerCertificateErrorDetected;
+      property OnFaviconChanged;
+      property OnGetFaviconCompleted;
   end;
 
 implementation
 
+{$IFDEF MSWINDOWS}{$IFDEF DELPHI24_UP}
 uses
-  uWVLoader;
+  FMX.Helpers.Win;
+{$ENDIF}{$ENDIF}
 
 function TWVFMXBrowser.GetParentForm : TCustomForm;
 var
@@ -132,6 +141,41 @@ begin
       end
      else
       TempComp := TempComp.owner;
+end;
+
+function TWVFMXBrowser.GetScreenScale : Single;
+{$IFDEF DELPHI24_UP}{$IFDEF MSWINDOWS}
+var
+  TempHandle : HWND;
+{$ENDIF}{$ENDIF}
+begin
+  Result := inherited GetScreenScale;
+  {$IFDEF DELPHI24_UP}{$IFDEF MSWINDOWS}
+  TempHandle := GetParentFormHandle;
+
+  if (TempHandle <> 0) then
+    Result := GetWndScale(TempHandle);
+  {$ENDIF}{$ENDIF}
+end;
+
+function TWVFMXBrowser.GetParentFormHandle : HWND;
+{$IFDEF MSWINDOWS}
+var
+  TempForm : TCustomForm;
+{$ENDIF}
+begin
+  Result := 0;
+
+  {$IFDEF MSWINDOWS}
+  TempForm := GetParentForm;
+
+  if (TempForm <> nil)  then
+    Result := FmxHandleToHWND(TempForm.Handle)
+   else
+    if (Application          <> nil) and
+       (Application.MainForm <> nil) then
+      Result := FmxHandleToHWND(Application.MainForm.Handle);
+  {$ENDIF}
 end;
 
 procedure TWVFMXBrowser.MoveFormTo(const x, y: Integer);

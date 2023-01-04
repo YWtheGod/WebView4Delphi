@@ -2,13 +2,15 @@ unit uWVInterfaces;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
-  {$IFDEF FPC}
-  ActiveX,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   Winapi.ActiveX,
+  {$ELSE}
+  ActiveX,
   {$ENDIF}
   uWVTypeLibrary, uWVTypes;
 
@@ -211,6 +213,21 @@ type
 
     // ICoreWebView2FramePermissionRequestedEventHandler
     function FramePermissionRequestedEventHandler_Invoke(const sender: ICoreWebView2Frame; const args: ICoreWebView2PermissionRequestedEventArgs2; aFrameID: integer): HResult;
+
+    // ICoreWebView2ClearBrowsingDataCompletedHandler
+    function ClearBrowsingDataCompletedHandler_Invoke(errorCode: HResult): HResult;
+
+    // ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler
+    function ClearServerCertificateErrorActionsCompletedHandler_Invoke(errorCode: HResult): HResult;
+
+    // ICoreWebView2ServerCertificateErrorDetectedEventHandler
+    function ServerCertificateErrorDetectedEventHandler_Invoke(const sender: ICoreWebView2; const args: ICoreWebView2ServerCertificateErrorDetectedEventArgs): HResult;
+
+    // ICoreWebView2FaviconChangedEventHandler
+    function FaviconChangedEventHandler_Invoke(const sender: ICoreWebView2; const args: IUnknown): HResult;
+
+    // ICoreWebView2GetFaviconCompletedHandler
+    function GetFaviconCompletedHandler_Invoke(errorCode: HResult; const faviconStream: IStream): HResult;
   end;
 
 implementation

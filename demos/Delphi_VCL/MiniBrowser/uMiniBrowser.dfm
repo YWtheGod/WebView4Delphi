@@ -14,7 +14,6 @@ object MiniBrowserFrm: TMiniBrowserFrm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 15
   object NavControlPnl: TPanel
     Left = 0
@@ -144,6 +143,10 @@ object MiniBrowserFrm: TMiniBrowserFrm
           'https://frames-per-second.appspot.com/'
           'https://badssl.com/'
           'https://www.httpwatch.com/httpgallery/authentication/'
+          
+            'https://www.sede.fnmt.gob.es/certificados/persona-fisica/verific' +
+            'ar-estado'
+          'https://badssl.com/'
           'edge://flags/'
           'edge://gpu/'
           'edge://about/')
@@ -231,6 +234,7 @@ object MiniBrowserFrm: TMiniBrowserFrm
     OnDocumentTitleChanged = WVBrowser1DocumentTitleChanged
     OnWebResourceRequested = WVBrowser1WebResourceRequested
     OnWebResourceResponseReceived = WVBrowser1WebResourceResponseReceived
+    OnWebResourceResponseViewGetContentCompleted = WVBrowser1WebResourceResponseViewGetContentCompleted
     OnDownloadStarting = WVBrowser1DownloadStarting
     OnPrintToPdfCompleted = WVBrowser1PrintToPdfCompleted
     OnBytesReceivedChanged = WVBrowser1BytesReceivedChanged
@@ -240,6 +244,9 @@ object MiniBrowserFrm: TMiniBrowserFrm
     OnRetrieveMHTMLCompleted = WVBrowser1RetrieveMHTMLCompleted
     OnBasicAuthenticationRequested = WVBrowser1BasicAuthenticationRequested
     OnStatusBarTextChanged = WVBrowser1StatusBarTextChanged
+    OnClearBrowsingDataCompleted = WVBrowser1ClearBrowsingDataCompleted
+    OnServerCertificateErrorDetected = WVBrowser1ServerCertificateErrorDetected
+    OnGetFaviconCompleted = WVBrowser1GetFaviconCompleted
     Left = 48
     Top = 64
   end
@@ -261,6 +268,10 @@ object MiniBrowserFrm: TMiniBrowserFrm
     object SaveToFileMi: TMenuItem
       Caption = 'Save to file...'
       OnClick = SaveToFileMiClick
+    end
+    object Saveresourceas1: TMenuItem
+      Caption = 'Save resource as...'
+      OnClick = Saveresourceas1Click
     end
     object N2: TMenuItem
       Caption = '-'
@@ -315,6 +326,10 @@ object MiniBrowserFrm: TMiniBrowserFrm
       Caption = 'Clear cache'
       OnClick = Clearcache1Click
     end
+    object Cleatallstorage1: TMenuItem
+      Caption = 'Cleat all browser data'
+      OnClick = Cleatallstorage1Click
+    end
     object Offline1: TMenuItem
       Caption = 'Offline'
       OnClick = Offline1Click
@@ -338,6 +353,10 @@ object MiniBrowserFrm: TMiniBrowserFrm
     object Browserprocesses1: TMenuItem
       Caption = 'Browser processes...'
       OnClick = Browserprocesses1Click
+    end
+    object Downloadfavicon1: TMenuItem
+      Caption = 'Download favicon...'
+      OnClick = Downloadfavicon1Click
     end
   end
   object OpenDialog1: TOpenDialog

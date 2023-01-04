@@ -2,22 +2,24 @@ unit uWVEvents;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
-  {$IFDEF FPC}
-  ActiveX, Messages,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   Winapi.ActiveX, Winapi.Messages,
+  {$ELSE}
+  ActiveX, Messages,
   {$ENDIF}
   uWVTypeLibrary, uWVTypes;
 
 type
   // Loader events
-  TLoaderNotifyEvent                                       = {$IFNDEF FPC}reference to{$ENDIF} procedure(Sender: TObject);
-  TLoaderBrowserProcessExitedEvent                         = {$IFNDEF FPC}reference to{$ENDIF} procedure(Sender: TObject; const aEnvironment: ICoreWebView2Environment; const aArgs: ICoreWebView2BrowserProcessExitedEventArgs);
-  TLoaderNewBrowserVersionAvailableEvent                   = {$IFNDEF FPC}reference to{$ENDIF} procedure(Sender: TObject; const aEnvironment: ICoreWebView2Environment);
-  TLoaderProcessInfosChangedEvent                          = {$IFNDEF FPC}reference to{$ENDIF} procedure(Sender: TObject; const aEnvironment: ICoreWebView2Environment);
+  TLoaderNotifyEvent                                       = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(Sender: TObject) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
+  TLoaderBrowserProcessExitedEvent                         = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(Sender: TObject; const aEnvironment: ICoreWebView2Environment; const aArgs: ICoreWebView2BrowserProcessExitedEventArgs) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
+  TLoaderNewBrowserVersionAvailableEvent                   = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(Sender: TObject; const aEnvironment: ICoreWebView2Environment) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
+  TLoaderProcessInfosChangedEvent                          = {$IFDEF DELPHI12_UP}reference to{$ENDIF} procedure(Sender: TObject; const aEnvironment: ICoreWebView2Environment) {$IFNDEF DELPHI12_UP}{$IFNDEF FPC} of object{$ENDIF}{$ENDIF};
 
   // Browser events
   TOnExecuteScriptCompletedEvent                           = procedure(Sender: TObject; aErrorCode: HRESULT; const aResultObjectAsJson: wvstring; aExecutionID: integer) of object;
@@ -77,6 +79,11 @@ type
   TOnCustomItemSelectedEvent                               = procedure(Sender: TObject; const aMenuItem: ICoreWebView2ContextMenuItem) of object;
   TOnStatusBarTextChangedEvent                             = procedure(Sender: TObject; const aWebView: ICoreWebView2) of object;
   TOnFramePermissionRequestedEvent                         = procedure(Sender: TObject; const aFrame: ICoreWebView2Frame; const aArgs: ICoreWebView2PermissionRequestedEventArgs2; aFrameID: integer) of object;
+  TOnClearBrowsingDataCompletedEvent                       = procedure(Sender: TObject; aErrorCode: HRESULT) of object;
+  TOnServerCertificateErrorActionsCompletedEvent           = procedure(Sender: TObject; aErrorCode: HRESULT) of object;
+  TOnServerCertificateErrorDetectedEvent                   = procedure(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2ServerCertificateErrorDetectedEventArgs) of object;
+  TOnFaviconChangedEvent                                   = procedure(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: IUnknown) of object;
+  TOnGetFaviconCompletedEvent                              = procedure(Sender: TObject; aErrorCode: HRESULT; const aFaviconStream: IStream) of object;
 
   // Custom events
   TOnCompMsgEvent                                          = procedure(Sender: TObject; var aMessage: TMessage; var aHandled: Boolean) of object;

@@ -7,21 +7,24 @@ interface
 const
   WEBVIEW2LOADERLIB_VERSION_MAJOR   = 1;
   WEBVIEW2LOADERLIB_VERSION_MINOR   = 0;
-  WEBVIEW2LOADERLIB_VERSION_RELEASE = 1072;
-  WEBVIEW2LOADERLIB_VERSION_BUILD   = 54;
+  WEBVIEW2LOADERLIB_VERSION_RELEASE = 1462;
+  WEBVIEW2LOADERLIB_VERSION_BUILD   = 37;
 
-  CHROMIUM_VERSION_MAJOR   = 97;
+  // For full API compatibility, WebView4Delphi requires the same
+  // WebView2 Runtime version mentioned in the release notes :
+  // https://docs.microsoft.com/en-us/microsoft-edge/webview2/release-notes
+  CHROMIUM_VERSION_MAJOR   = 108;
   CHROMIUM_VERSION_MINOR   = 0;
-  CHROMIUM_VERSION_RELEASE = 1072;
-  CHROMIUM_VERSION_BUILD   = 55;
+  CHROMIUM_VERSION_RELEASE = WEBVIEW2LOADERLIB_VERSION_RELEASE;
+  CHROMIUM_VERSION_BUILD   = WEBVIEW2LOADERLIB_VERSION_BUILD;
 
   CRLF = #13 + #10;
 
-  {$IFDEF FPC}
+  {$IF NOT DECLARED(USER_DEFAULT_SCREEN_DPI)}
   USER_DEFAULT_SCREEN_DPI = 96;
-  {$ENDIF}
+  {$IFEND}
 
-  // These contants are declared in the "Windows" unit but
+  // These constants are declared in the "Windows" unit but
   // some old Delphi versions don't have them.
   // We have to add "WV2_" to be compatible with C++ Builder.
   WV2_IMAGE_FILE_MACHINE_I386  = $014C;

@@ -25,6 +25,8 @@ type
       WVFMXBrowser1: TWVFMXBrowser;
       WindowParentLay: TLayout;
       FocusWorkaroundBtn: TButton;
+      StatusBar1: TStatusBar;
+      StatusLbl: TLabel;
 
       procedure BackBtnClick(Sender: TObject);
       procedure ForwardBtnClick(Sender: TObject);
@@ -36,6 +38,8 @@ type
       procedure WVFMXBrowser1SourceChanged(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2SourceChangedEventArgs);
       procedure WVFMXBrowser1GotFocus(Sender: TObject);
       procedure WVFMXBrowser1DocumentTitleChanged(Sender: TObject);
+    procedure WVFMXBrowser1StatusBarTextChanged(Sender: TObject;
+      const aWebView: ICoreWebView2);
 
     protected
       FMXWindowParent       : TWVFMXWindowParent;
@@ -104,7 +108,10 @@ end;
 procedure TBrowserFrame.ResizeBrowser;
 begin
   if (FMXWindowParent <> nil) then
-    FMXWindowParent.SetBounds(GetFMXWindowParentRect);
+    begin
+      FMXWindowParent.SetBounds(GetFMXWindowParentRect);
+      FMXWindowParent.UpdateSize;
+    end;
 end;
 
 procedure TBrowserFrame.ShowBrowser;
@@ -125,15 +132,13 @@ end;
 
 function TBrowserFrame.GetFMXWindowParentRect : System.Types.TRect;
 var
-  TempRect  : TRectF;
-  TempScale : single;
+  TempPoint : TPointF;
 begin
-  TempScale       := GlobalWebView2Loader.DeviceScaleFactor;
-  TempRect        := WindowParentLay.AbsoluteRect;
-  Result.Left     := round(TempRect.Left   * TempScale);
-  Result.Top      := round(TempRect.Top    * TempScale);
-  Result.Right    := round(TempRect.Right  * TempScale) - 1;
-  Result.Bottom   := round(TempREct.Bottom * TempScale) - 1;
+  TempPoint     := LocalToAbsolute(WindowParentLay.Position.Point);
+  Result.Left   := round(TempPoint.x);
+  Result.Top    := round(TempPoint.y);
+  Result.Right  := round(TempPoint.x + WindowParentLay.Width);
+  Result.Bottom := round(TempPoint.y + WindowParentLay.Height);
 end;
 
 procedure TBrowserFrame.GoBtnClick(Sender: TObject);
@@ -174,6 +179,12 @@ procedure TBrowserFrame.WVFMXBrowser1SourceChanged(Sender: TObject;
   const aArgs: ICoreWebView2SourceChangedEventArgs);
 begin
   URLEdt.Text := WVFMXBrowser1.Source;
+end;
+
+procedure TBrowserFrame.WVFMXBrowser1StatusBarTextChanged(Sender: TObject;
+  const aWebView: ICoreWebView2);
+begin
+  StatusLbl.Text := WVFMXBrowser1.StatusBarText;
 end;
 
 procedure TBrowserFrame.BackBtnClick(Sender: TObject);

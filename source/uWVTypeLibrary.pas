@@ -15,6 +15,8 @@ unit uWVTypeLibrary;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 
 // ************************************************************************ //
 // WARNING                                                                    
@@ -28,10 +30,10 @@ unit uWVTypeLibrary;
 // ************************************************************************ //
 
 // $Rev: 98336 $
-// File generated on 13/04/2022 10:14:53 from Type Library described below.
+// File generated on 06/12/2022 11:28:25 from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: T:\microsoft.web.webview2.1.0.1185.39.nupkg_FILES\WebView2.tlb (1)
+// Type Lib: S:\microsoft.web.webview2.1.0.1462.37.nupkg_FILES\WebView2.tlb (1)
 // LIBID: {26D34152-879F-4065-BEA2-3DAA2CFADFB8}
 // LCID: 0
 // Helpfile: 
@@ -55,10 +57,10 @@ unit uWVTypeLibrary;
 interface
 
 uses
-  {$IFDEF FPC}
-  Windows, Classes, Variants, Graphics, ActiveX;
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   Winapi.Windows, System.Classes, System.Variants, System.Win.StdVCL, Vcl.Graphics, Winapi.ActiveX;
+  {$ELSE}
+  Windows, Classes, Variants, Graphics, ActiveX;
   {$ENDIF}
 
   
@@ -180,16 +182,23 @@ const
   IID_ICoreWebView2ContextMenuTarget: TGUID = '{B8611D99-EED6-4F3F-902C-A198502AD472}';
   IID_ICoreWebView2_12: TGUID = '{35D69927-BCFA-4566-9349-6B3E0D154CAC}';
   IID_ICoreWebView2StatusBarTextChangedEventHandler: TGUID = '{A5E3B0D0-10DF-4156-BFAD-3B43867ACAC6}';
+  IID_ICoreWebView2_13: TGUID = '{F75F09A8-667E-4983-88D6-C8773F315E84}';
+  IID_ICoreWebView2Profile: TGUID = '{79110AD3-CD5D-4373-8BC3-C60658F17A5F}';
   IID_ICoreWebView2BrowserProcessExitedEventArgs: TGUID = '{1F00663F-AF8C-4782-9CDD-DD01C52E34CB}';
   IID_ICoreWebView2BrowserProcessExitedEventHandler: TGUID = '{FA504257-A216-4911-A860-FE8825712861}';
   IID_ICoreWebView2CompositionController: TGUID = '{3DF9B733-B9AE-4A15-86B4-EB9EE9826469}';
   IID_ICoreWebView2PointerInfo: TGUID = '{E6995887-D10D-4F5D-9359-4CE46E4F96B9}';
   IID_ICoreWebView2CursorChangedEventHandler: TGUID = '{9DA43CCC-26E1-4DAD-B56C-D8961C94C571}';
   IID_ICoreWebView2CompositionController2: TGUID = '{0B6A3D24-49CB-4806-BA20-B5E0734A7B26}';
+  IID_ICoreWebView2CompositionController3: TGUID = '{9570570E-4D76-4361-9EE1-F04D0DBDFB1E}';
   IID_ICoreWebView2Controller2: TGUID = '{C979903E-D4CA-4228-92EB-47EE3FA96EAB}';
   IID_ICoreWebView2Controller3: TGUID = '{F9614724-5D2B-41DC-AEF7-73D62B51543B}';
   IID_ICoreWebView2RasterizationScaleChangedEventHandler: TGUID = '{9C98C8B1-AC53-427E-A345-3049B5524BBE}';
   IID_ICoreWebView2Controller4: TGUID = '{97D418D5-A426-4E49-A151-E1A10F327D9E}';
+  IID_ICoreWebView2ControllerOptions: TGUID = '{12AAE616-8CCB-44EC-BCB3-EB1831881635}';
+  IID_ICoreWebView2Certificate: TGUID = '{C5FB2FCE-1CAC-4AEE-9C79-5ED0362EAAE0}';
+  IID_ICoreWebView2ClearBrowsingDataCompletedHandler: TGUID = '{E9710A06-1D1D-49B2-8234-226F35846AE5}';
+  IID_ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler: TGUID = '{3B40AAC6-ACFE-4FFD-8211-F607B96E2D5B}';
   IID_ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler: TGUID = '{02FAB84B-1428-4FB7-AD45-1B2E64736184}';
   IID_ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler: TGUID = '{4E8A3389-C9D8-4BD2-B6B5-124FEE6CC14D}';
   IID_ICoreWebView2DevToolsProtocolEventReceivedEventArgs2: TGUID = '{2DC4959D-1494-4393-95BA-BEA4CB9EBD1B}';
@@ -204,6 +213,7 @@ const
   IID_ICoreWebView2ProcessInfoCollection: TGUID = '{402B99CD-A0CC-4FA5-B7A5-51D86A1D2339}';
   IID_ICoreWebView2ProcessInfo: TGUID = '{84FA7612-3F3D-4FBF-889D-FAD000492D72}';
   IID_ICoreWebView2Environment9: TGUID = '{F06F41BF-4B5A-49D8-B9F6-FA16CD29F274}';
+  IID_ICoreWebView2Environment10: TGUID = '{EE0EB9DF-6F12-46CE-B53F-3F47B9C928E0}';
   IID_ICoreWebView2EnvironmentOptions: TGUID = '{2FDE08A8-1E9A-4766-8C05-95A9CEB9D1C5}';
   IID_ICoreWebView2EnvironmentOptions2: TGUID = '{FF85C98A-1BA7-4A6B-90C8-2B752C89E9E2}';
   IID_ICoreWebView2Frame2: TGUID = '{7A6A5834-D185-4DBF-B63F-4A9BC43107D4}';
@@ -218,15 +228,23 @@ const
   IID_ICoreWebView2FrameInfo: TGUID = '{DA86B8A1-BDF3-4F11-9955-528CEFA59727}';
   IID_ICoreWebView2FrameInfoCollection: TGUID = '{8F834154-D38E-4D90-AFFB-6800A7272839}';
   IID_ICoreWebView2FrameInfoCollectionIterator: TGUID = '{1BF89E2D-1B2B-4629-B28F-05099B41BB03}';
+  IID_ICoreWebView2NavigationCompletedEventArgs2: TGUID = '{FDF8B738-EE1E-4DB2-A329-8D7D7B74D792}';
   IID_ICoreWebView2NavigationStartingEventArgs2: TGUID = '{9086BE93-91AA-472D-A7E0-579F2BA006AD}';
   IID_ICoreWebView2NewWindowRequestedEventArgs2: TGUID = '{BBC7BAED-74C6-4C92-B63A-7F5AEAE03DE3}';
   IID_ICoreWebView2ProcessFailedEventArgs2: TGUID = '{4DAB9422-46FA-4C3E-A5D2-41D2071D3680}';
+  IID_ICoreWebView2Profile2: TGUID = '{FA740D4B-5EAE-4344-A8AD-74BE31925397}';
+  IID_ICoreWebView2ServerCertificateErrorDetectedEventArgs: TGUID = '{012193ED-7C13-48FF-969D-A84C1F432A14}';
+  IID_ICoreWebView2ServerCertificateErrorDetectedEventHandler: TGUID = '{969B3A26-D85E-4795-8199-FEF57344DA22}';
   IID_ICoreWebView2Settings2: TGUID = '{EE9A0F68-F46C-4E32-AC23-EF8CAC224D2A}';
   IID_ICoreWebView2Settings3: TGUID = '{FDB5AB74-AF33-4854-84F0-0A631DEB5EBA}';
   IID_ICoreWebView2Settings4: TGUID = '{CB56846C-4168-4D53-B04F-03B6D6796FF2}';
   IID_ICoreWebView2Settings5: TGUID = '{183E7052-1D03-43A0-AB99-98E043B66B39}';
   IID_ICoreWebView2Settings6: TGUID = '{11CB3ACD-9BC8-43B8-83BF-F40753714F87}';
   IID_ICoreWebView2Settings7: TGUID = '{488DC902-35EF-42D2-BC7D-94B65C4BC49C}';
+  IID_ICoreWebView2FaviconChangedEventHandler: TGUID = '{2913DA94-833D-4DE0-8DCA-900FC524A1A4}';
+  IID_ICoreWebView2GetFaviconCompletedHandler: TGUID = '{A2508329-7DA8-49D7-8C05-FA125E4AEE8D}';
+  IID_ICoreWebView2_14: TGUID = '{6DAA4F10-4A90-4753-8898-77C5DF534165}';
+  IID_ICoreWebView2_15: TGUID = '{517B2D1D-7DAE-4A66-A4F4-10352FFB9518}';
 
 // *********************************************************************//
 // Declaration of Enumerations defined in Type Library                    
@@ -448,6 +466,14 @@ const
   COREWEBVIEW2_CONTEXT_MENU_TARGET_KIND_AUDIO = $00000003;
   COREWEBVIEW2_CONTEXT_MENU_TARGET_KIND_VIDEO = $00000004;
 
+// Constants for enum COREWEBVIEW2_PREFERRED_COLOR_SCHEME
+type
+  COREWEBVIEW2_PREFERRED_COLOR_SCHEME = TOleEnum;
+const
+  COREWEBVIEW2_PREFERRED_COLOR_SCHEME_AUTO = $00000000;
+  COREWEBVIEW2_PREFERRED_COLOR_SCHEME_LIGHT = $00000001;
+  COREWEBVIEW2_PREFERRED_COLOR_SCHEME_DARK = $00000002;
+
 // Constants for enum COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND
 type
   COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND = TOleEnum;
@@ -529,6 +555,35 @@ const
   COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED = $00000003;
   COREWEBVIEW2_PROCESS_FAILED_REASON_LAUNCH_FAILED = $00000004;
   COREWEBVIEW2_PROCESS_FAILED_REASON_OUT_OF_MEMORY = $00000005;
+  COREWEBVIEW2_PROCESS_FAILED_REASON_PROFILE_DELETED = $00000006;
+
+// Constants for enum COREWEBVIEW2_BROWSING_DATA_KINDS
+type
+  COREWEBVIEW2_BROWSING_DATA_KINDS = TOleEnum;
+const
+  COREWEBVIEW2_BROWSING_DATA_KINDS_FILE_SYSTEMS = $00000001;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_INDEXED_DB = $00000002;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_LOCAL_STORAGE = $00000004;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_WEB_SQL = $00000008;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_CACHE_STORAGE = $00000010;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_ALL_DOM_STORAGE = $00000020;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_COOKIES = $00000040;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_ALL_SITE = $00000080;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_DISK_CACHE = $00000100;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_DOWNLOAD_HISTORY = $00000200;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_GENERAL_AUTOFILL = $00000400;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_PASSWORD_AUTOSAVE = $00000800;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_BROWSING_HISTORY = $00001000;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_SETTINGS = $00002000;
+  COREWEBVIEW2_BROWSING_DATA_KINDS_ALL_PROFILE = $00004000;
+
+// Constants for enum COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION
+type
+  COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION = TOleEnum;
+const
+  COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_ALWAYS_ALLOW = $00000000;
+  COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_CANCEL = $00000001;
+  COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_DEFAULT = $00000002;
 
 // Constants for enum COREWEBVIEW2_PDF_TOOLBAR_ITEMS
 type
@@ -538,6 +593,23 @@ const
   COREWEBVIEW2_PDF_TOOLBAR_ITEMS_SAVE = $00000001;
   COREWEBVIEW2_PDF_TOOLBAR_ITEMS_PRINT = $00000002;
   COREWEBVIEW2_PDF_TOOLBAR_ITEMS_SAVE_AS = $00000004;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_ZOOM_IN = $00000008;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_ZOOM_OUT = $00000010;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_ROTATE = $00000020;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_FIT_PAGE = $00000040;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_PAGE_LAYOUT = $00000080;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_BOOKMARKS = $00000100;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_PAGE_SELECTOR = $00000200;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_SEARCH = $00000400;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_FULL_SCREEN = $00000800;
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_MORE_SETTINGS = $00001000;
+
+// Constants for enum COREWEBVIEW2_FAVICON_IMAGE_FORMAT
+type
+  COREWEBVIEW2_FAVICON_IMAGE_FORMAT = TOleEnum;
+const
+  COREWEBVIEW2_FAVICON_IMAGE_FORMAT_PNG = $00000000;
+  COREWEBVIEW2_FAVICON_IMAGE_FORMAT_JPEG = $00000001;
 
 type
 
@@ -647,16 +719,23 @@ type
   ICoreWebView2ContextMenuTarget = interface;
   ICoreWebView2_12 = interface;
   ICoreWebView2StatusBarTextChangedEventHandler = interface;
+  ICoreWebView2_13 = interface;
+  ICoreWebView2Profile = interface;
   ICoreWebView2BrowserProcessExitedEventArgs = interface;
   ICoreWebView2BrowserProcessExitedEventHandler = interface;
   ICoreWebView2CompositionController = interface;
   ICoreWebView2PointerInfo = interface;
   ICoreWebView2CursorChangedEventHandler = interface;
   ICoreWebView2CompositionController2 = interface;
+  ICoreWebView2CompositionController3 = interface;
   ICoreWebView2Controller2 = interface;
   ICoreWebView2Controller3 = interface;
   ICoreWebView2RasterizationScaleChangedEventHandler = interface;
   ICoreWebView2Controller4 = interface;
+  ICoreWebView2ControllerOptions = interface;
+  ICoreWebView2Certificate = interface;
+  ICoreWebView2ClearBrowsingDataCompletedHandler = interface;
+  ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler = interface;
   ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler = interface;
   ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler = interface;
   ICoreWebView2DevToolsProtocolEventReceivedEventArgs2 = interface;
@@ -671,6 +750,7 @@ type
   ICoreWebView2ProcessInfoCollection = interface;
   ICoreWebView2ProcessInfo = interface;
   ICoreWebView2Environment9 = interface;
+  ICoreWebView2Environment10 = interface;
   ICoreWebView2EnvironmentOptions = interface;
   ICoreWebView2EnvironmentOptions2 = interface;
   ICoreWebView2Frame2 = interface;
@@ -685,15 +765,23 @@ type
   ICoreWebView2FrameInfo = interface;
   ICoreWebView2FrameInfoCollection = interface;
   ICoreWebView2FrameInfoCollectionIterator = interface;
+  ICoreWebView2NavigationCompletedEventArgs2 = interface;
   ICoreWebView2NavigationStartingEventArgs2 = interface;
   ICoreWebView2NewWindowRequestedEventArgs2 = interface;
   ICoreWebView2ProcessFailedEventArgs2 = interface;
+  ICoreWebView2Profile2 = interface;
+  ICoreWebView2ServerCertificateErrorDetectedEventArgs = interface;
+  ICoreWebView2ServerCertificateErrorDetectedEventHandler = interface;
   ICoreWebView2Settings2 = interface;
   ICoreWebView2Settings3 = interface;
   ICoreWebView2Settings4 = interface;
   ICoreWebView2Settings5 = interface;
   ICoreWebView2Settings6 = interface;
   ICoreWebView2Settings7 = interface;
+  ICoreWebView2FaviconChangedEventHandler = interface;
+  ICoreWebView2GetFaviconCompletedHandler = interface;
+  ICoreWebView2_14 = interface;
+  ICoreWebView2_15 = interface;
 
 // *********************************************************************//
 // Declaration of structures, unions and aliases.                         
@@ -2251,6 +2339,32 @@ type
   end;
 
 // *********************************************************************//
+// Interface: ICoreWebView2_13
+// Flags:     (0)
+// GUID:      {F75F09A8-667E-4983-88D6-C8773F315E84}
+// *********************************************************************//
+  ICoreWebView2_13 = interface(ICoreWebView2_12)
+    ['{F75F09A8-667E-4983-88D6-C8773F315E84}']
+    function Get_Profile(out value: ICoreWebView2Profile): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2Profile
+// Flags:     (0)
+// GUID:      {79110AD3-CD5D-4373-8BC3-C60658F17A5F}
+// *********************************************************************//
+  ICoreWebView2Profile = interface(IUnknown)
+    ['{79110AD3-CD5D-4373-8BC3-C60658F17A5F}']
+    function Get_ProfileName(out value: PWideChar): HResult; stdcall;
+    function Get_IsInPrivateModeEnabled(out value: Integer): HResult; stdcall;
+    function Get_ProfilePath(out value: PWideChar): HResult; stdcall;
+    function Get_DefaultDownloadFolderPath(out value: PWideChar): HResult; stdcall;
+    function Set_DefaultDownloadFolderPath(value: PWideChar): HResult; stdcall;
+    function Get_PreferredColorScheme(out value: COREWEBVIEW2_PREFERRED_COLOR_SCHEME): HResult; stdcall;
+    function Set_PreferredColorScheme(value: COREWEBVIEW2_PREFERRED_COLOR_SCHEME): HResult; stdcall;
+  end;
+
+// *********************************************************************//
 // Interface: ICoreWebView2BrowserProcessExitedEventArgs
 // Flags:     (0)
 // GUID:      {1F00663F-AF8C-4782-9CDD-DD01C52E34CB}
@@ -2380,6 +2494,21 @@ type
   end;
 
 // *********************************************************************//
+// Interface: ICoreWebView2CompositionController3
+// Flags:     (0)
+// GUID:      {9570570E-4D76-4361-9EE1-F04D0DBDFB1E}
+// *********************************************************************//
+  ICoreWebView2CompositionController3 = interface(ICoreWebView2CompositionController2)
+    ['{9570570E-4D76-4361-9EE1-F04D0DBDFB1E}']
+    function DragEnter(const dataObject: IDataObject; keyState: LongWord; point: tagPOINT; 
+                       out effect: LongWord): HResult; stdcall;
+    function DragLeave: HResult; stdcall;
+    function DragOver(keyState: LongWord; point: tagPOINT; out effect: LongWord): HResult; stdcall;
+    function Drop(const dataObject: IDataObject; keyState: LongWord; point: tagPOINT; 
+                  out effect: LongWord): HResult; stdcall;
+  end;
+
+// *********************************************************************//
 // Interface: ICoreWebView2Controller2
 // Flags:     (0)
 // GUID:      {C979903E-D4CA-4228-92EB-47EE3FA96EAB}
@@ -2427,6 +2556,56 @@ type
     ['{97D418D5-A426-4E49-A151-E1A10F327D9E}']
     function Get_AllowExternalDrop(out value: Integer): HResult; stdcall;
     function Set_AllowExternalDrop(value: Integer): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2ControllerOptions
+// Flags:     (0)
+// GUID:      {12AAE616-8CCB-44EC-BCB3-EB1831881635}
+// *********************************************************************//
+  ICoreWebView2ControllerOptions = interface(IUnknown)
+    ['{12AAE616-8CCB-44EC-BCB3-EB1831881635}']
+    function Get_ProfileName(out value: PWideChar): HResult; stdcall;
+    function Set_ProfileName(value: PWideChar): HResult; stdcall;
+    function Get_IsInPrivateModeEnabled(out value: Integer): HResult; stdcall;
+    function Set_IsInPrivateModeEnabled(value: Integer): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2Certificate
+// Flags:     (0)
+// GUID:      {C5FB2FCE-1CAC-4AEE-9C79-5ED0362EAAE0}
+// *********************************************************************//
+  ICoreWebView2Certificate = interface(IUnknown)
+    ['{C5FB2FCE-1CAC-4AEE-9C79-5ED0362EAAE0}']
+    function Get_Subject(out value: PWideChar): HResult; stdcall;
+    function Get_Issuer(out value: PWideChar): HResult; stdcall;
+    function Get_ValidFrom(out value: Double): HResult; stdcall;
+    function Get_ValidTo(out value: Double): HResult; stdcall;
+    function Get_DerEncodedSerialNumber(out value: PWideChar): HResult; stdcall;
+    function Get_DisplayName(out value: PWideChar): HResult; stdcall;
+    function ToPemEncoding(out pemEncodedData: PWideChar): HResult; stdcall;
+    function Get_PemEncodedIssuerCertificateChain(out value: ICoreWebView2StringCollection): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2ClearBrowsingDataCompletedHandler
+// Flags:     (0)
+// GUID:      {E9710A06-1D1D-49B2-8234-226F35846AE5}
+// *********************************************************************//
+  ICoreWebView2ClearBrowsingDataCompletedHandler = interface(IUnknown)
+    ['{E9710A06-1D1D-49B2-8234-226F35846AE5}']
+    function Invoke(errorCode: HResult): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler
+// Flags:     (0)
+// GUID:      {3B40AAC6-ACFE-4FFD-8211-F607B96E2D5B}
+// *********************************************************************//
+  ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler = interface(IUnknown)
+    ['{3B40AAC6-ACFE-4FFD-8211-F607B96E2D5B}']
+    function Invoke(errorCode: HResult): HResult; stdcall;
   end;
 
 // *********************************************************************//
@@ -2582,6 +2761,24 @@ type
     function CreateContextMenuItem(Label_: PWideChar; const iconStream: IStream; 
                                    Kind: COREWEBVIEW2_CONTEXT_MENU_ITEM_KIND; 
                                    out item: ICoreWebView2ContextMenuItem): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2Environment10
+// Flags:     (0)
+// GUID:      {EE0EB9DF-6F12-46CE-B53F-3F47B9C928E0}
+// *********************************************************************//
+  ICoreWebView2Environment10 = interface(ICoreWebView2Environment9)
+    ['{EE0EB9DF-6F12-46CE-B53F-3F47B9C928E0}']
+    function CreateCoreWebView2ControllerOptions(out options: ICoreWebView2ControllerOptions): HResult; stdcall;
+    // var ParentWindow: _RemotableHandle --> ParentWindow: HWND    ************** WEBVIEW4DELPHI **************
+    function CreateCoreWebView2ControllerWithOptions(ParentWindow: HWND;
+                                                     const options: ICoreWebView2ControllerOptions;
+                                                     const handler: ICoreWebView2CreateCoreWebView2ControllerCompletedHandler): HResult; stdcall;
+    // var ParentWindow: _RemotableHandle --> ParentWindow: HWND    ************** WEBVIEW4DELPHI **************
+    function CreateCoreWebView2CompositionControllerWithOptions(ParentWindow: HWND;
+                                                                const options: ICoreWebView2ControllerOptions; 
+                                                                const handler: ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler): HResult; stdcall;
   end;
 
 // *********************************************************************//
@@ -2763,6 +2960,16 @@ type
   end;
 
 // *********************************************************************//
+// Interface: ICoreWebView2NavigationCompletedEventArgs2
+// Flags:     (0)
+// GUID:      {FDF8B738-EE1E-4DB2-A329-8D7D7B74D792}
+// *********************************************************************//
+  ICoreWebView2NavigationCompletedEventArgs2 = interface(ICoreWebView2NavigationCompletedEventArgs)
+    ['{FDF8B738-EE1E-4DB2-A329-8D7D7B74D792}']
+    function Get_HttpStatusCode(out http_status_code: SYSINT): HResult; stdcall;
+  end;
+
+// *********************************************************************//
 // Interface: ICoreWebView2NavigationStartingEventArgs2
 // Flags:     (0)
 // GUID:      {9086BE93-91AA-472D-A7E0-579F2BA006AD}
@@ -2794,6 +3001,47 @@ type
     function Get_ExitCode(out ExitCode: SYSINT): HResult; stdcall;
     function Get_ProcessDescription(out ProcessDescription: PWideChar): HResult; stdcall;
     function Get_FrameInfosForFailedProcess(out frames: ICoreWebView2FrameInfoCollection): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2Profile2
+// Flags:     (0)
+// GUID:      {FA740D4B-5EAE-4344-A8AD-74BE31925397}
+// *********************************************************************//
+  ICoreWebView2Profile2 = interface(ICoreWebView2Profile)
+    ['{FA740D4B-5EAE-4344-A8AD-74BE31925397}']
+    function ClearBrowsingData(dataKinds: COREWEBVIEW2_BROWSING_DATA_KINDS; 
+                               const handler: ICoreWebView2ClearBrowsingDataCompletedHandler): HResult; stdcall;
+    function ClearBrowsingDataInTimeRange(dataKinds: COREWEBVIEW2_BROWSING_DATA_KINDS; 
+                                          startTime: Double; endTime: Double; 
+                                          const handler: ICoreWebView2ClearBrowsingDataCompletedHandler): HResult; stdcall;
+    function ClearBrowsingDataAll(const handler: ICoreWebView2ClearBrowsingDataCompletedHandler): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2ServerCertificateErrorDetectedEventArgs
+// Flags:     (0)
+// GUID:      {012193ED-7C13-48FF-969D-A84C1F432A14}
+// *********************************************************************//
+  ICoreWebView2ServerCertificateErrorDetectedEventArgs = interface(IUnknown)
+    ['{012193ED-7C13-48FF-969D-A84C1F432A14}']
+    function Get_ErrorStatus(out value: COREWEBVIEW2_WEB_ERROR_STATUS): HResult; stdcall;
+    function Get_RequestUri(out value: PWideChar): HResult; stdcall;
+    function Get_ServerCertificate(out value: ICoreWebView2Certificate): HResult; stdcall;
+    function Get_Action(out value: COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION): HResult; stdcall;
+    function Set_Action(value: COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION): HResult; stdcall;
+    function GetDeferral(out deferral: ICoreWebView2Deferral): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2ServerCertificateErrorDetectedEventHandler
+// Flags:     (0)
+// GUID:      {969B3A26-D85E-4795-8199-FEF57344DA22}
+// *********************************************************************//
+  ICoreWebView2ServerCertificateErrorDetectedEventHandler = interface(IUnknown)
+    ['{969B3A26-D85E-4795-8199-FEF57344DA22}']
+    function Invoke(const sender: ICoreWebView2; 
+                    const args: ICoreWebView2ServerCertificateErrorDetectedEventArgs): HResult; stdcall;
   end;
 
 // *********************************************************************//
@@ -2864,13 +3112,61 @@ type
     function Set_HiddenPdfToolbarItems(hidden_pdf_toolbar_items: COREWEBVIEW2_PDF_TOOLBAR_ITEMS): HResult; stdcall;
   end;
 
+// *********************************************************************//
+// Interface: ICoreWebView2FaviconChangedEventHandler
+// Flags:     (0)
+// GUID:      {2913DA94-833D-4DE0-8DCA-900FC524A1A4}
+// *********************************************************************//
+  ICoreWebView2FaviconChangedEventHandler = interface(IUnknown)
+    ['{2913DA94-833D-4DE0-8DCA-900FC524A1A4}']
+    function Invoke(const sender: ICoreWebView2; const args: IUnknown): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2GetFaviconCompletedHandler
+// Flags:     (0)
+// GUID:      {A2508329-7DA8-49D7-8C05-FA125E4AEE8D}
+// *********************************************************************//
+  ICoreWebView2GetFaviconCompletedHandler = interface(IUnknown)
+    ['{A2508329-7DA8-49D7-8C05-FA125E4AEE8D}']
+    function Invoke(errorCode: HResult; const faviconStream: IStream): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2_14
+// Flags:     (0)
+// GUID:      {6DAA4F10-4A90-4753-8898-77C5DF534165}
+// *********************************************************************//
+  ICoreWebView2_14 = interface(ICoreWebView2_13)
+    ['{6DAA4F10-4A90-4753-8898-77C5DF534165}']
+    function add_ServerCertificateErrorDetected(const eventHandler: ICoreWebView2ServerCertificateErrorDetectedEventHandler;
+                                                out token: EventRegistrationToken): HResult; stdcall;
+    function remove_ServerCertificateErrorDetected(token: EventRegistrationToken): HResult; stdcall;
+    function ClearServerCertificateErrorActions(const handler: ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler): HResult; stdcall;
+  end;
+
+// *********************************************************************//
+// Interface: ICoreWebView2_15
+// Flags:     (0)
+// GUID:      {517B2D1D-7DAE-4A66-A4F4-10352FFB9518}
+// *********************************************************************//
+  ICoreWebView2_15 = interface(ICoreWebView2_14)
+    ['{517B2D1D-7DAE-4A66-A4F4-10352FFB9518}']
+    function add_FaviconChanged(const eventHandler: ICoreWebView2FaviconChangedEventHandler; 
+                                out token: EventRegistrationToken): HResult; stdcall;
+    function remove_FaviconChanged(token: EventRegistrationToken): HResult; stdcall;
+    function Get_FaviconUri(out value: PWideChar): HResult; stdcall;
+    function GetFavicon(format: COREWEBVIEW2_FAVICON_IMAGE_FORMAT; 
+                        const completedHandler: ICoreWebView2GetFaviconCompletedHandler): HResult; stdcall;
+  end;
+
 implementation
 
 uses
-  {$IFDEF FPC}
-  ComObj;
+  {$IFDEF DELPHI16_UP}  
+  System.Win.ComObj;    
   {$ELSE}
-  System.Win.ComObj;
+  ComObj;
   {$ENDIF}
 
 

@@ -2,6 +2,8 @@ unit uWVCoreWebView2Settings;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
@@ -82,11 +84,12 @@ type
 implementation
 
 uses
-  {$IFDEF FPC}
-  ActiveX;
+  {$IFDEF DELPHI16_UP}
+  Winapi.ActiveX,
   {$ELSE}
-  Winapi.ActiveX;
+  ActiveX,
   {$ENDIF}
+  uWVMiscFunctions;
 
 
 constructor TCoreWebView2Settings.Create(const aBaseIntf : ICoreWebView2Settings);
@@ -98,12 +101,12 @@ begin
   FBaseIntf := aBaseIntf;
 
   if Initialized and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Settings2, FBaseIntf2)) and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Settings3, FBaseIntf3)) and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Settings4, FBaseIntf4)) and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Settings5, FBaseIntf5)) and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Settings6, FBaseIntf6)) then
-    FBaseIntf.QueryInterface(IID_ICoreWebView2Settings7, FBaseIntf7);
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Settings2, FBaseIntf2) and
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Settings3, FBaseIntf3) and
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Settings4, FBaseIntf4) and
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Settings5, FBaseIntf5) and
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Settings6, FBaseIntf6) then
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Settings7, FBaseIntf7);
 end;
 
 destructor TCoreWebView2Settings.Destroy;

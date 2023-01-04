@@ -2,6 +2,8 @@ unit uWVCoreWebView2ContextMenuItemCollection;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
@@ -21,6 +23,7 @@ type
       destructor  Destroy; override;
       function    RemoveValueAtIndex(index: cardinal): boolean;
       function    InsertValueAtIndex(index: cardinal; const aValue: ICoreWebView2ContextMenuItem): boolean;
+      function    AppendValue(const aValue: ICoreWebView2ContextMenuItem): boolean;
       procedure   RemoveAllMenuItems;
       procedure   RemoveMenuItem(aCommandId : integer); overload;
       procedure   RemoveMenuItem(const aLabel : wvstring); overload;
@@ -34,10 +37,10 @@ type
 implementation
 
 uses
-  {$IFDEF FPC}
-  SysUtils, ActiveX,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   System.SysUtils, Winapi.ActiveX,
+  {$ELSE}
+  SysUtils, ActiveX,
   {$ENDIF}
   uWVCoreWebView2ContextMenuItem;
 
@@ -95,6 +98,12 @@ function TCoreWebView2ContextMenuItemCollection.InsertValueAtIndex(index: cardin
 begin
   Result := Initialized and
             succeeded(FBaseIntf.InsertValueAtIndex(index, aValue));
+end;
+
+function TCoreWebView2ContextMenuItemCollection.AppendValue(const aValue: ICoreWebView2ContextMenuItem): boolean;
+begin
+  Result := Initialized and
+            InsertValueAtIndex(Count, aValue);
 end;
 
 procedure TCoreWebView2ContextMenuItemCollection.RemoveAllMenuItems;

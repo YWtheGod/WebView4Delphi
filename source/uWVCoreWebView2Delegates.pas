@@ -2,13 +2,15 @@ unit uWVCoreWebView2Delegates;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
-  {$IFDEF FPC}
-  Windows, ActiveX,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   WinApi.Windows, Winapi.ActiveX,
+  {$ELSE}
+  Windows, ActiveX,
   {$ENDIF}
   uWVTypeLibrary, uWVInterfaces, uWVTypes;
 
@@ -710,6 +712,61 @@ type
 
     public
       constructor Create(const aEvents: IWVBrowserEvents; aFrameID : integer); reintroduce;
+      destructor  Destroy; override;
+  end;
+
+  TCoreWebView2ClearBrowsingDataCompletedHandler = class(TInterfacedObject, ICoreWebView2ClearBrowsingDataCompletedHandler)
+    protected
+      FEvents : Pointer;
+
+      function Invoke(errorCode: HResult): HResult; stdcall;
+
+    public
+      constructor Create(const aEvents: IWVBrowserEvents); reintroduce;
+      destructor  Destroy; override;
+  end;
+
+  TCoreWebView2ClearServerCertificateErrorActionsCompletedHandler = class(TInterfacedObject, ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler)
+    protected
+      FEvents : Pointer;
+
+      function Invoke(errorCode: HResult): HResult; stdcall;
+
+    public
+      constructor Create(const aEvents: IWVBrowserEvents); reintroduce;
+      destructor  Destroy; override;
+  end;
+
+  TCoreWebView2ServerCertificateErrorDetectedEventHandler = class(TInterfacedObject, ICoreWebView2ServerCertificateErrorDetectedEventHandler)
+    protected
+      FEvents : Pointer;
+
+      function Invoke(const sender: ICoreWebView2; const args: ICoreWebView2ServerCertificateErrorDetectedEventArgs): HResult; stdcall;
+
+    public
+      constructor Create(const aEvents: IWVBrowserEvents); reintroduce;
+      destructor  Destroy; override;
+  end;
+
+  TCoreWebView2FaviconChangedEventHandler = class(TInterfacedObject, ICoreWebView2FaviconChangedEventHandler)
+    protected
+      FEvents : Pointer;
+
+      function Invoke(const sender: ICoreWebView2; const args: IUnknown): HResult; stdcall;
+
+    public
+      constructor Create(const aEvents: IWVBrowserEvents); reintroduce;
+      destructor  Destroy; override;
+  end;
+
+  TCoreWebView2GetFaviconCompletedHandler = class(TInterfacedObject, ICoreWebView2GetFaviconCompletedHandler)
+    protected
+      FEvents : Pointer;
+
+      function Invoke(errorCode: HResult; const faviconStream: IStream): HResult; stdcall;
+
+    public
+      constructor Create(const aEvents: IWVBrowserEvents); reintroduce;
       destructor  Destroy; override;
   end;
 
@@ -2309,6 +2366,132 @@ function TCoreWebView2FramePermissionRequestedEventHandler.Invoke(const sender :
 begin
   if (FEvents <> nil) then
     Result := IWVBrowserEvents(FEvents).FramePermissionRequestedEventHandler_Invoke(sender, args, FFrameID)
+   else
+    Result := E_FAIL;
+end;
+
+
+// TCoreWebView2ClearBrowsingDataCompletedHandler
+
+constructor TCoreWebView2ClearBrowsingDataCompletedHandler.Create(const aEvents: IWVBrowserEvents);
+begin
+  inherited Create;
+
+  FEvents := Pointer(aEvents);
+end;
+
+destructor TCoreWebView2ClearBrowsingDataCompletedHandler.Destroy;
+begin
+  FEvents := nil;
+
+  inherited Destroy;
+end;
+
+function TCoreWebView2ClearBrowsingDataCompletedHandler.Invoke(errorCode: HResult): HResult; stdcall;
+begin
+  if (FEvents <> nil) then
+    Result := IWVBrowserEvents(FEvents).ClearBrowsingDataCompletedHandler_Invoke(errorCode)
+   else
+    Result := E_FAIL;
+end;
+
+
+// TCoreWebView2ClearServerCertificateErrorActionsCompletedHandler
+
+constructor TCoreWebView2ClearServerCertificateErrorActionsCompletedHandler.Create(const aEvents: IWVBrowserEvents);
+begin
+  inherited Create;
+
+  FEvents := Pointer(aEvents);
+end;
+
+destructor TCoreWebView2ClearServerCertificateErrorActionsCompletedHandler.Destroy;
+begin
+  FEvents := nil;
+
+  inherited Destroy;
+end;
+
+function TCoreWebView2ClearServerCertificateErrorActionsCompletedHandler.Invoke(errorCode: HResult): HResult; stdcall;
+begin
+  if (FEvents <> nil) then
+    Result := IWVBrowserEvents(FEvents).ClearServerCertificateErrorActionsCompletedHandler_Invoke(errorCode)
+   else
+    Result := E_FAIL;
+end;
+
+
+// TCoreWebView2ServerCertificateErrorDetectedEventHandler
+
+constructor TCoreWebView2ServerCertificateErrorDetectedEventHandler.Create(const aEvents: IWVBrowserEvents);
+begin
+  inherited Create;
+
+  FEvents := Pointer(aEvents);
+end;
+
+destructor TCoreWebView2ServerCertificateErrorDetectedEventHandler.Destroy;
+begin
+  FEvents := nil;
+
+  inherited Destroy;
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventHandler.Invoke(const sender : ICoreWebView2;
+                                                                        const args   : ICoreWebView2ServerCertificateErrorDetectedEventArgs): HResult; stdcall;
+begin
+  if (FEvents <> nil) then
+    Result := IWVBrowserEvents(FEvents).ServerCertificateErrorDetectedEventHandler_Invoke(sender, args)
+   else
+    Result := E_FAIL;
+end;
+
+
+// TCoreWebView2FaviconChangedEventHandler
+
+constructor TCoreWebView2FaviconChangedEventHandler.Create(const aEvents: IWVBrowserEvents);
+begin
+  inherited Create;
+
+  FEvents := Pointer(aEvents);
+end;
+
+destructor TCoreWebView2FaviconChangedEventHandler.Destroy;
+begin
+  FEvents := nil;
+
+  inherited Destroy;
+end;
+
+function TCoreWebView2FaviconChangedEventHandler.Invoke(const sender: ICoreWebView2; const args: IUnknown): HResult; stdcall;
+begin
+  if (FEvents <> nil) then
+    Result := IWVBrowserEvents(FEvents).FaviconChangedEventHandler_Invoke(sender, args)
+   else
+    Result := E_FAIL;
+end;
+
+
+// TCoreWebView2GetFaviconCompletedHandler
+
+constructor TCoreWebView2GetFaviconCompletedHandler.Create(const aEvents: IWVBrowserEvents);
+begin
+  inherited Create;
+
+  FEvents := Pointer(aEvents);
+end;
+
+destructor TCoreWebView2GetFaviconCompletedHandler.Destroy;
+begin
+  FEvents := nil;
+
+  inherited Destroy;
+end;
+
+function TCoreWebView2GetFaviconCompletedHandler.Invoke(errorCode: HResult; const faviconStream: IStream): HResult; stdcall;
+begin
+  if (FEvents <> nil) then
+    Result := IWVBrowserEvents(FEvents).GetFaviconCompletedHandler_Invoke(errorCode, faviconStream)
    else
     Result := E_FAIL;
 end;

@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus,
-  WinApi.TlHelp32, Winapi.PsAPI,
+  WinApi.TlHelp32, Winapi.PsAPI, Winapi.ActiveX, Vcl.AxCtrls,
   uWVBrowser, uWVWinControl, uWVWindowParent, uWVTypes, uWVConstants, uWVTypeLibrary,
   uWVLibFunctions, uWVLoader, uWVInterfaces, uWVCoreWebView2Args, uWVCoreWebView2DownloadOperation,
   uWVBrowserBase, uBasicUserAuthForm;
@@ -55,6 +55,9 @@ type
     Changeuseragentstring1: TMenuItem;
     Muted1: TMenuItem;
     Browserprocesses1: TMenuItem;
+    Cleatallstorage1: TMenuItem;
+    Saveresourceas1: TMenuItem;
+    Downloadfavicon1: TMenuItem;
 
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -88,6 +91,9 @@ type
     procedure Changeuseragentstring1Click(Sender: TObject);
     procedure Muted1Click(Sender: TObject);
     procedure Browserprocesses1Click(Sender: TObject);
+    procedure Cleatallstorage1Click(Sender: TObject);
+    procedure Saveresourceas1Click(Sender: TObject);
+    procedure Downloadfavicon1Click(Sender: TObject);
 
     procedure WVBrowser1AfterCreated(Sender: TObject);
     procedure WVBrowser1DocumentTitleChanged(Sender: TObject);
@@ -106,8 +112,11 @@ type
     procedure WVBrowser1RetrieveTextCompleted(Sender: TObject; aResult: Boolean; const aText: wvstring);
     procedure WVBrowser1RetrieveMHTMLCompleted(Sender: TObject; aResult: Boolean; const aMHTML: wvstring);
     procedure WVBrowser1BasicAuthenticationRequested(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2BasicAuthenticationRequestedEventArgs);
-    procedure WVBrowser1StatusBarTextChanged(Sender: TObject;
-      const aWebView: ICoreWebView2);
+    procedure WVBrowser1StatusBarTextChanged(Sender: TObject; const aWebView: ICoreWebView2);
+    procedure WVBrowser1WebResourceResponseViewGetContentCompleted(Sender: TObject; aErrorCode: HRESULT; const aContents: IStream; aResourceID: Integer);
+    procedure WVBrowser1ClearBrowsingDataCompleted(Sender: TObject; aErrorCode: HRESULT);
+    procedure WVBrowser1ServerCertificateErrorDetected(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2ServerCertificateErrorDetectedEventArgs);
+    procedure WVBrowser1GetFaviconCompleted(Sender: TObject; aErrorCode: HRESULT; const aFaviconStream: IStream);
 
   protected
     FDownloadOperation : TCoreWebView2DownloadOperation;
@@ -117,6 +126,7 @@ type
     FGetHeaders        : boolean;
     FHeaders           : TStringList;
     FUserAuthFrm       : TTBasicUserAuthForm;
+    FResourceContents  : TBytes;
 
     procedure UpdateNavButtons(aIsNavigating : boolean);
     procedure UpdateDownloadInfo(aDownloadID : integer);
@@ -141,10 +151,11 @@ implementation
 {$R *.dfm}
 
 uses
-  Winapi.ActiveX, uTextViewerForm,
+  uTextViewerForm,
   uWVCoreWebView2WebResourceResponseView, uWVCoreWebView2HttpResponseHeaders,
   uWVCoreWebView2HttpHeadersCollectionIterator,
-  uWVCoreWebView2ProcessInfoCollection, uWVCoreWebView2ProcessInfo;
+  uWVCoreWebView2ProcessInfoCollection, uWVCoreWebView2ProcessInfo,
+  uWVCoreWebView2Delegates;
 
 procedure TMiniBrowserFrm.Takesnapshot1Click(Sender: TObject);
 var
@@ -269,6 +280,11 @@ begin
   WVBrowser1.ClearCache;
 end;
 
+procedure TMiniBrowserFrm.Cleatallstorage1Click(Sender: TObject);
+begin
+  WVBrowser1.ClearBrowsingDataAll;
+end;
+
 procedure TMiniBrowserFrm.ConfigBtnClick(Sender: TObject);
 var
   TempPoint : TPoint;
@@ -290,24 +306,30 @@ begin
   WVBrowser1.OpenDevToolsWindow;
 end;
 
+procedure TMiniBrowserFrm.Downloadfavicon1Click(Sender: TObject);
+begin
+  WVBrowser1.GetFavicon;
+end;
+
 procedure TMiniBrowserFrm.FormCreate(Sender: TObject);
 begin
   FGetHeaders             := True;
   FHeaders                := TStringList.Create;
   FFileStream             := nil;
   FUserAuthFrm            := nil;
+  FResourceContents       := nil;
   FBlockImages            := False;
   FDownloadIDGen          := 0;
   FDownloadOperation      := nil;
-  WVBrowser1.DefaultURL := URLCbx.Text;
+  WVBrowser1.DefaultURL   := URLCbx.Text;
 end;
 
 procedure TMiniBrowserFrm.FormDestroy(Sender: TObject);
 begin
-  if (FHeaders <> nil) then
+  if assigned(FHeaders) then
     FreeAndNil(FHeaders);
 
-  if (FFileStream <> nil) then
+  if assigned(FFileStream) then
     FreeAndNil(FFileStream);
 
   if assigned(FDownloadOperation) then
@@ -444,6 +466,9 @@ begin
   // We need to a filter to enable the TWVBrowser.OnWebResourceRequested event
   WVBrowser1.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_IMAGE);
   WVBrowser1.AddWebResourceRequestedFilter('*', COREWEBVIEW2_WEB_RESOURCE_CONTEXT_MEDIA);
+
+  WVBrowser1.CoreWebView2PrintSettings.HeaderTitle := 'Tituloooooo';
+  WVBrowser1.CoreWebView2PrintSettings.ShouldPrintHeaderAndFooter := True;
 end;
 
 procedure TMiniBrowserFrm.WVBrowser1BasicAuthenticationRequested(
@@ -470,6 +495,15 @@ begin
 
   if (FFileStream <> nil) then
     FreeAndNil(FFileStream);
+end;
+
+procedure TMiniBrowserFrm.WVBrowser1ClearBrowsingDataCompleted(
+  Sender: TObject; aErrorCode: HRESULT);
+begin
+  if succeeded(aErrorCode) then
+    showmessage('Browser data cleared successfully!')
+   else
+    showmessage('There was an error clearing the browser data');
 end;
 
 procedure TMiniBrowserFrm.UpdateDownloadInfo(aDownloadID : integer);
@@ -550,6 +584,46 @@ begin
     end;
 end;
 
+procedure TMiniBrowserFrm.WVBrowser1GetFaviconCompleted(Sender: TObject;
+  aErrorCode: HRESULT; const aFaviconStream: IStream);
+var
+  TempOLEStream  : TOLEStream;
+  TempFavicon    : TBytes;
+  TempFileStream : TFileStream;
+begin
+  TempOLEStream  := nil;
+  TempFileStream := nil;
+  try
+    if succeeded(aErrorCode) and assigned(aFaviconStream) then
+      begin
+        TempOLEStream          := TOLEStream.Create(aFaviconStream);
+        TempOLEStream.Position := 0;
+
+        if (TempOLEStream.Size > 0) then
+          begin
+            SetLength(TempFavicon, TempOLEStream.Size);
+            TempOLEStream.Read(TempFavicon, TempOLEStream.Size);
+
+            SaveDialog1.Filter     := 'PNG files (*.png)|*.png';
+            SaveDialog1.DefaultExt := 'png';
+
+            if SaveDialog1.Execute and (length(SaveDialog1.FileName) > 0) then
+              try
+                TempFileStream := TFileStream.Create(SaveDialog1.FileName, fmCreate);
+                TempFileStream.Write(TempFavicon, length(TempFavicon));
+              finally
+                FreeAndNil(TempFileStream);
+              end;
+          end;
+      end
+     else
+      showmessage('There was an error downloading the favicon');
+  finally
+    if assigned(TempOLEStream) then
+      FreeAndNil(TempOLEStream);
+  end;
+end;
+
 procedure TMiniBrowserFrm.WVBrowser1InitializationError(Sender: TObject;
   aErrorCode: HRESULT; const aErrorMessage: wvstring);
 begin
@@ -557,9 +631,15 @@ begin
 end;
 
 procedure TMiniBrowserFrm.WVBrowser1NavigationCompleted(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2NavigationCompletedEventArgs);
+var
+  TempArgs : TCoreWebView2NavigationCompletedEventArgs;
+  TempStatus : integer;
 begin
+  TempArgs := TCoreWebView2NavigationCompletedEventArgs.Create(aArgs);
+  TempStatus := TempArgs.HttpStatusCode;
+  TempArgs.Free;
   UpdateNavButtons(False);
-  StatusBar1.Panels[0].Text := 'Navigation completed.';
+  StatusBar1.Panels[0].Text := 'Navigation completed. HTTP Status code: ' + inttostr(TempStatus);
 end;
 
 procedure TMiniBrowserFrm.WVBrowser1NavigationStarting(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2NavigationStartingEventArgs);
@@ -610,6 +690,32 @@ begin
     end;
 end;
 
+procedure TMiniBrowserFrm.Saveresourceas1Click(Sender: TObject);
+begin
+  try
+    if assigned(FResourceContents) and (length(FResourceContents) > 0) then
+      begin
+        SaveDialog1.Filter     := 'HTML files (*.html)|*.html';
+        SaveDialog1.DefaultExt := 'html';
+
+        if SaveDialog1.Execute and (length(SaveDialog1.FileName) > 0) then
+          try
+            if (FFileStream <> nil) then FreeAndNil(FFileStream);
+
+            FFileStream := TFileStream.Create(SaveDialog1.FileName, fmCreate);
+            FFileStream.Write(FResourceContents, length(FResourceContents));
+          finally
+            FreeAndNil(FFileStream);
+          end;
+      end;
+  except
+    {$IFDEF DEBUG}
+    on e : exception do
+      OutputDebugString(PWideChar('TMiniBrowserFrm.Saveresourceas1Click error: ' + e.message + chr(0)));
+    {$ENDIF}
+  end;
+end;
+
 procedure TMiniBrowserFrm.WVBrowser1RetrieveHTMLCompleted(Sender: TObject;
   aResult: Boolean; const aHTML: wvstring);
 begin
@@ -629,6 +735,20 @@ procedure TMiniBrowserFrm.WVBrowser1RetrieveTextCompleted(Sender: TObject;
 begin
   if aResult then
     SaveAsTextFile(SaveDialog1.FileName, aText);
+end;
+
+procedure TMiniBrowserFrm.WVBrowser1ServerCertificateErrorDetected(
+  Sender: TObject; const aWebView: ICoreWebView2;
+  const aArgs: ICoreWebView2ServerCertificateErrorDetectedEventArgs);
+var
+  TempArgs : TCoreWebView2ServerCertificateErrorDetectedEventArgs;
+begin
+  StatusBar1.Panels[0].Text := 'Server certificate error detected';
+
+  // This will override the safety warning and allow the bad server certificate
+  TempArgs        := TCoreWebView2ServerCertificateErrorDetectedEventArgs.Create(aArgs);
+  TempArgs.Action := COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_ALWAYS_ALLOW;
+  TempArgs.Free;
 end;
 
 procedure TMiniBrowserFrm.WVBrowser1SourceChanged(Sender: TObject; const aWebView: ICoreWebView2; const aArgs: ICoreWebView2SourceChangedEventArgs);
@@ -670,6 +790,7 @@ var
   TempIterator : TCoreWebView2HttpHeadersCollectionIterator;
   TempName     : wvstring;
   TempValue    : wvstring;
+  TempHandler  : ICoreWebView2WebResourceResponseViewGetContentCompletedHandler;
 begin
   if FGetHeaders then
     try
@@ -677,8 +798,13 @@ begin
       FGetHeaders  := False;
       TempArgs     := TCoreWebView2WebResourceResponseReceivedEventArgs.Create(aArgs);
       TempResponse := TCoreWebView2WebResourceResponseView.Create(TempArgs.Response);
+      TempHandler  := TCoreWebView2WebResourceResponseViewGetContentCompletedHandler.Create(WVBrowser1);
       TempHeaders  := TCoreWebView2HttpResponseHeaders.Create(TempResponse.Headers);
       TempIterator := TCoreWebView2HttpHeadersCollectionIterator.Create(TempHeaders.Iterator);
+
+      // GetContent will trigger the TWVBrowserBase.OnWebResourceResponseViewGetContentCompleted
+      // event with the contents of this resource, which in this case corresponds to the HTML contents.
+      TempResponse.GetContent(TempHandler);
 
       while TempIterator.HasCurrentHeader do
         begin
@@ -692,7 +818,35 @@ begin
       FreeAndNil(TempHeaders);
       FreeAndNil(TempResponse);
       FreeAndNil(TempArgs);
+      TempHandler := nil;
     end;
+end;
+
+procedure TMiniBrowserFrm.WVBrowser1WebResourceResponseViewGetContentCompleted(
+  Sender: TObject; aErrorCode: HRESULT; const aContents: IStream;
+  aResourceID: Integer);
+var
+  TempOLEStream : TOLEStream;
+begin
+  TempOLEStream := nil;
+  try
+    // Copy the resource contents into FResourceContents
+    // The "Save resource as..." menu option will save FResourceContents in an HTML file.
+    if succeeded(aErrorCode) and assigned(aContents) then
+      begin
+        TempOLEStream          := TOLEStream.Create(aContents);
+        TempOLEStream.Position := 0;
+
+        if (TempOLEStream.Size > 0) then
+          begin
+            SetLength(FResourceContents, TempOLEStream.Size);
+            TempOLEStream.Read(FResourceContents, TempOLEStream.Size);
+          end;
+      end;
+  finally
+    if assigned(TempOLEStream) then
+      FreeAndNil(TempOLEStream);
+  end;
 end;
 
 procedure TMiniBrowserFrm.ReloadBtnClick(Sender: TObject);
@@ -765,9 +919,14 @@ end;
 initialization
   GlobalWebView2Loader                := TWVLoader.Create(nil);
   GlobalWebView2Loader.UserDataFolder := ExtractFileDir(Application.ExeName) + '\CustomCache';
+
+  // Set GlobalWebView2Loader.BrowserExecPath if you don't want to use the evergreen version of WebView Runtime
+  //GlobalWebView2Loader.BrowserExecPath := 'c:\WVRuntime';
+
   // Uncomment these lines to enable the debug log in 'CustomCache\EBWebView\chrome_debug.log'
   //GlobalWebView2Loader.DebugLog       := TWV2DebugLog.dlEnabled;
   //GlobalWebView2Loader.DebugLogLevel  := TWV2DebugLogLevel.dllInfo;
+
   GlobalWebView2Loader.StartWebView2;
 
 end.

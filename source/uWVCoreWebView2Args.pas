@@ -2,13 +2,15 @@ unit uWVCoreWebView2Args;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
-  {$IFDEF FPC}
-  Types, ActiveX,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   System.Types, Winapi.ActiveX,
+  {$ELSE}
+  Types, ActiveX,
   {$ENDIF}
   uWVTypeLibrary, uWVTypes;
 
@@ -108,12 +110,14 @@ type
 
   TCoreWebView2NavigationCompletedEventArgs = class
     protected
-      FBaseIntf : ICoreWebView2NavigationCompletedEventArgs;
+      FBaseIntf  : ICoreWebView2NavigationCompletedEventArgs;
+      FBaseIntf2 : ICoreWebView2NavigationCompletedEventArgs2;
 
       function GetInitialized : boolean;
       function GetIsSuccess : boolean;
       function GetWebErrorStatus : TWVWebErrorStatus;
       function GetNavigationID : uint64;
+      function GetHttpStatusCode : integer;
 
     public
       constructor Create(const aArgs: ICoreWebView2NavigationCompletedEventArgs); reintroduce;
@@ -124,6 +128,7 @@ type
       property IsSuccess      : boolean                                    read GetIsSuccess;
       property WebErrorStatus : TWVWebErrorStatus                          read GetWebErrorStatus;
       property NavigationID   : uint64                                     read GetNavigationID;
+      property HttpStatusCode : integer                                    read GetHttpStatusCode;
   end;
 
   TCoreWebView2NavigationStartingEventArgs = class
@@ -522,9 +527,37 @@ type
       property Deferral                      : ICoreWebView2Deferral                               read GetDeferral;
   end;
 
+  TCoreWebView2ServerCertificateErrorDetectedEventArgs = class
+    protected
+      FBaseIntf : ICoreWebView2ServerCertificateErrorDetectedEventArgs;
+
+      function  GetInitialized : boolean;
+      function  GetErrorStatus : TWVWebErrorStatus;
+      function  GetRequestUri : wvstring;
+      function  GetServerCertificate : ICoreWebView2Certificate;
+      function  GetAction : TWVServerCertificateErrorAction;
+      function  GetDeferral : ICoreWebView2Deferral;
+
+      procedure SetAction(aValue: TWVServerCertificateErrorAction);
+
+    public
+      constructor Create(const aArgs: ICoreWebView2ServerCertificateErrorDetectedEventArgs); reintroduce;
+      destructor  Destroy; override;
+
+      property Initialized                   : boolean                                              read GetInitialized;
+      property BaseIntf                      : ICoreWebView2ServerCertificateErrorDetectedEventArgs read FBaseIntf;
+      property ErrorStatus                   : TWVWebErrorStatus                                    read GetErrorStatus;
+      property RequestUri                    : wvstring                                             read GetRequestUri;
+      property ServerCertificate             : ICoreWebView2Certificate                             read GetServerCertificate;
+      property Action                        : TWVServerCertificateErrorAction                      read GetAction              write SetAction;
+      property Deferral                      : ICoreWebView2Deferral                                read GetDeferral;
+  end;
+
 
 implementation
 
+uses
+  uWVMiscFunctions;
 
 // TCoreWebView2AcceleratorKeyPressedEventArgs
 
@@ -681,10 +714,10 @@ end;
 
 function TCoreWebView2ContentLoadingEventArgs.GetNavigationId : uint64;
 var
-  TempID : uint64;
+  TempID : Largeuint;
 begin
   if Initialized and succeeded(FBaseIntf.Get_NavigationId(TempID)) then
-    Result := TempID
+    Result := uint64(TempID)
    else
     Result := 0;
 end;
@@ -699,7 +732,7 @@ begin
   FBaseIntf := aArgs;
 
   if Initialized then
-    FBaseIntf.QueryInterface(ICoreWebView2DevToolsProtocolEventReceivedEventArgs2, FBaseIntf2);
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2DevToolsProtocolEventReceivedEventArgs2, FBaseIntf2);
 end;
 
 destructor TCoreWebView2DevToolsProtocolEventReceivedEventArgs.Destroy;
@@ -741,6 +774,7 @@ begin
       CoTaskMemFree(TempString);
     end;
 end;
+
 
 
 // TCoreWebView2MoveFocusRequestedEventArgs
@@ -796,7 +830,11 @@ constructor TCoreWebView2NavigationCompletedEventArgs.Create(const aArgs: ICoreW
 begin
   inherited Create;
 
-  FBaseIntf := aArgs;
+  FBaseIntf  := aArgs;
+  FBaseIntf2 := nil;
+
+  if Initialized then
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2NavigationCompletedEventArgs2, FBaseIntf2);
 end;
 
 destructor TCoreWebView2NavigationCompletedEventArgs.Destroy;
@@ -832,12 +870,24 @@ end;
 
 function TCoreWebView2NavigationCompletedEventArgs.GetNavigationID : uint64;
 var
-  TempID : uint64;
+  TempID : Largeuint;
 begin
   if Initialized and succeeded(FBaseIntf.Get_NavigationId(TempID)) then
-    Result := TempID
+    Result := uint64(TempID)
    else
     Result := 0;
+end;
+
+function TCoreWebView2NavigationCompletedEventArgs.GetHttpStatusCode : integer;
+var
+  TempResult : SYSINT;
+begin
+  Result     := 0;
+  TempResult := 0;
+
+  if assigned(FBaseIntf2) and
+     succeeded(FBaseIntf2.Get_HttpStatusCode(TempResult)) then
+    Result := TempResult;
 end;
 
 
@@ -852,7 +902,7 @@ begin
   FBaseIntf := aArgs;
 
   if Initialized then
-    FBaseIntf.QueryInterface(ICoreWebView2NavigationStartingEventArgs2, FBaseIntf2);
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2NavigationStartingEventArgs2, FBaseIntf2);
 end;
 
 destructor TCoreWebView2NavigationStartingEventArgs.Destroy;
@@ -930,10 +980,10 @@ end;
 
 function TCoreWebView2NavigationStartingEventArgs.GetNavigationID : uint64;
 var
-  TempInt : uint64;
+  TempID : Largeuint;
 begin
-  if Initialized and succeeded(FBaseIntf.Get_NavigationId(TempInt)) then
-    Result := TempInt
+  if Initialized and succeeded(FBaseIntf.Get_NavigationId(TempID)) then
+    Result := uint64(TempID)
    else
     Result := 0;
 end;
@@ -976,7 +1026,7 @@ begin
   FBaseIntf2 := nil;
 
   if Initialized then
-    FBaseIntf.QueryInterface(IID_ICoreWebView2NewWindowRequestedEventArgs2, FBaseIntf2);
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2NewWindowRequestedEventArgs2, FBaseIntf2);
 end;
 
 destructor TCoreWebView2NewWindowRequestedEventArgs.Destroy;
@@ -1103,15 +1153,16 @@ begin
   FBaseIntf := aArgs;
 
   if Initialized then
-    FBaseIntf.QueryInterface(ICoreWebView2PermissionRequestedEventArgs2, FBaseIntf2);
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2PermissionRequestedEventArgs2, FBaseIntf2);
 end;
 
 constructor TCoreWebView2PermissionRequestedEventArgs.Create(const aArgs: ICoreWebView2PermissionRequestedEventArgs2);
 begin
   inherited Create;
 
-  aArgs.QueryInterface(ICoreWebView2PermissionRequestedEventArgs, FBaseIntf);
   FBaseIntf2 := aArgs;
+
+  LoggedQueryInterface(aArgs, IID_ICoreWebView2PermissionRequestedEventArgs, FBaseIntf);
 end;
 
 destructor TCoreWebView2PermissionRequestedEventArgs.Destroy;
@@ -1218,7 +1269,7 @@ begin
   FBaseIntf2 := nil;
 
   if Initialized then
-    FBaseIntf.QueryInterface(IID_ICoreWebView2ProcessFailedEventArgs2, FBaseIntf2);
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2ProcessFailedEventArgs2, FBaseIntf2);
 end;
 
 destructor TCoreWebView2ProcessFailedEventArgs.Destroy;
@@ -1252,7 +1303,7 @@ begin
   Result     := 0;
   TempResult := 0;
 
-  if (FBaseIntf2 <> nil) and
+  if assigned(FBaseIntf2) and
      succeeded(FBaseIntf2.Get_reason(TempResult)) then
     Result := TempResult;
 end;
@@ -1264,7 +1315,7 @@ begin
   Result     := 0;
   TempResult := 0;
 
-  if (FBaseIntf2 <> nil) and
+  if assigned(FBaseIntf2) and
      succeeded(FBaseIntf2.Get_ExitCode(TempResult)) then
     Result := TempResult;
 end;
@@ -1276,7 +1327,7 @@ begin
   Result     := '';
   TempString := nil;
 
-  if (FBaseIntf2 <> nil) and
+  if assigned(FBaseIntf2) and
      succeeded(FBaseIntf2.Get_ProcessDescription(TempString)) and
      (TempString <> nil) then
     begin
@@ -1292,7 +1343,7 @@ begin
   Result     := nil;
   TempResult := nil;
 
-  if (FBaseIntf2 <> nil) and
+  if assigned(FBaseIntf2) and
      succeeded(FBaseIntf2.Get_FrameInfosForFailedProcess(TempResult)) and
      (TempResult <> nil) then
     Result := TempResult;
@@ -1712,10 +1763,10 @@ end;
 
 function TCoreWebView2DOMContentLoadedEventArgs.GetNavigationID : uint64;
 var
-  TempID : uint64;
+  TempID : Largeuint;
 begin
   if Initialized and succeeded(FBaseIntf.Get_NavigationId(TempID)) then
-    Result := TempID
+    Result := uint64(TempID)
    else
     Result := 0;
 end;
@@ -2188,6 +2239,97 @@ procedure TCoreWebView2ContextMenuRequestedEventArgs.SetHandled(aValue : boolean
 begin
   if Initialized then
     FBaseIntf.Set_Handled(ord(aValue));
+end;
+
+
+// TCoreWebView2ServerCertificateErrorDetectedEventArgs
+
+constructor TCoreWebView2ServerCertificateErrorDetectedEventArgs.Create(const aArgs: ICoreWebView2ServerCertificateErrorDetectedEventArgs);
+begin
+  inherited Create;
+
+  FBaseIntf := aArgs;
+end;
+
+destructor TCoreWebView2ServerCertificateErrorDetectedEventArgs.Destroy;
+begin
+  FBaseIntf := nil;
+
+  inherited Destroy;
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventArgs.GetInitialized : boolean;
+begin
+  Result := assigned(FBaseIntf);
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventArgs.GetErrorStatus : TWVWebErrorStatus;
+var
+  TempResult : COREWEBVIEW2_WEB_ERROR_STATUS;
+begin
+  Result := 0;
+
+  if Initialized and
+     succeeded(FBaseIntf.Get_ErrorStatus(TempResult)) then
+    Result := TempResult;
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventArgs.GetRequestUri : wvstring;
+var
+  TempString : PWideChar;
+begin
+  Result     := '';
+  TempString := nil;
+
+  if Initialized and
+     succeeded(FBaseIntf.Get_RequestUri(TempString)) then
+    begin
+      Result := TempString;
+      CoTaskMemFree(TempString);
+    end;
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventArgs.GetServerCertificate : ICoreWebView2Certificate;
+var
+  TempResult : ICoreWebView2Certificate;
+begin
+  Result     := nil;
+  TempResult := nil;
+
+  if Initialized and
+     succeeded(FBaseIntf.Get_ServerCertificate(TempResult)) and
+     (TempResult <> nil) then
+    Result := TempResult;
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventArgs.GetAction : TWVServerCertificateErrorAction;
+var
+  TempResult : COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION;
+begin
+  Result := 0;
+
+  if Initialized and
+     succeeded(FBaseIntf.Get_Action(TempResult)) then
+    Result := TempResult;
+end;
+
+function TCoreWebView2ServerCertificateErrorDetectedEventArgs.GetDeferral : ICoreWebView2Deferral;
+var
+  TempResult : ICoreWebView2Deferral;
+begin
+  Result     := nil;
+  TempResult := nil;
+
+  if Initialized and
+     succeeded(FBaseIntf.GetDeferral(TempResult)) and
+     (TempResult <> nil) then
+    Result := TempResult;
+end;
+
+procedure TCoreWebView2ServerCertificateErrorDetectedEventArgs.SetAction(aValue: TWVServerCertificateErrorAction);
+begin
+  if Initialized then
+    FBaseIntf.Set_Action(aValue);
 end;
 
 end.

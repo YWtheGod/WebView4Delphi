@@ -2,13 +2,15 @@ unit uWVCoreWebView2Controller;
 
 {$IFDEF FPC}{$MODE Delphi}{$ENDIF}
 
+{$I webview2.inc}
+
 interface
 
 uses
-  {$IFDEF FPC}
-  Classes, Graphics, Windows, SysUtils,
-  {$ELSE}
+  {$IFDEF DELPHI16_UP}
   System.Classes, System.Types, System.UITypes, Winapi.Windows, System.SysUtils,
+  {$ELSE}
+  Classes, Graphics, Windows, SysUtils,
   {$ENDIF}
   uWVTypeLibrary, uWVTypes;
 
@@ -96,9 +98,9 @@ begin
   FBaseIntf := aBaseIntf;
 
   if Initialized and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Controller2, FBaseIntf2)) and
-     succeeded(FBaseIntf.QueryInterface(IID_ICoreWebView2Controller3, FBaseIntf3)) then
-    FBaseIntf.QueryInterface(IID_ICoreWebView2Controller4, FBaseIntf4);
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Controller2, FBaseIntf2) and
+     LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Controller3, FBaseIntf3) then
+    LoggedQueryInterface(FBaseIntf, IID_ICoreWebView2Controller4, FBaseIntf4);
 end;
 
 destructor TCoreWebView2Controller.Destroy;
@@ -408,10 +410,10 @@ begin
      succeeded(FBaseIntf2.Get_DefaultBackgroundColor(TempResult)) then
     Result := CoreWebViewColorToDelphiColor(TempResult)
    else
-    {$IFDEF FPC}
-    Result := clNone;
-    {$ELSE}
+    {$IFDEF DELPHI16_UP}
     Result := TColors.SysNone;  // clNone
+    {$ELSE}
+    Result := clNone;
     {$ENDIF}
 end;
 
